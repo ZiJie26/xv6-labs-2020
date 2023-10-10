@@ -2,7 +2,36 @@
 
 ****System calls****
 
-[toc]
+***by ZJay/楚梓杰***
+
+- [MIT 6.S081 Fall 2020 Lab 2](#mit-6s081-fall-2020-lab-2)
+  - [开始前](#开始前)
+  - [System call tracing](#system-call-tracing)
+    - [实验代码部分](#实验代码部分)
+      - [`kernel/syscall.h`](#kernelsyscallh)
+      - [`user/usys.pl`](#userusyspl)
+      - [`user/user.h`](#useruserh)
+      - [`kernel/proc.h`](#kernelproch)
+      - [`kernel/sysproc.c`](#kernelsysprocc)
+      - [`kernel/proc.c`](#kernelprocc)
+      - [`kernel/syscall.c`](#kernelsyscallc)
+      - [`trace.c`](#tracec)
+      - [编译执行](#编译执行)
+  - [Sysinfo（moderate）](#sysinfomoderate)
+    - [实验代码部分](#实验代码部分-1)
+      - [`kernel/defs.h`](#kerneldefsh)
+      - [`kernel/kalloc.c`](#kernelkallocc)
+      - [`kernel/proc.c`](#kernelprocc-1)
+      - [`kernel/syscall.c`](#kernelsyscallc-1)
+      - [`kernel/syscall.h`](#kernelsyscallh-1)
+      - [`kernel/sysproc.c`](#kernelsysprocc-1)
+      - [`user/user.h`](#useruserh-1)
+      - [`user/usys.pl`](#userusyspl-1)
+      - [编译运行](#编译运行)
+  - [make grade](#make-grade)
+  - [Note](#note)
+    - [系统调用全流程](#系统调用全流程)
+    - [空闲内存页](#空闲内存页)
 
 ## 开始前
 
