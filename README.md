@@ -4,6 +4,8 @@
 
 学习笔记：
 
+[BuildingEnvironment/环境搭建](/BuildingEnvironment.md)
+
 [Lab 1](MIT%206.S081%20Fall%202020%20Lab%201.md)
 
 [Lab 2](MIT%206.S081%20Fall%202020%20Lab%202.md)
