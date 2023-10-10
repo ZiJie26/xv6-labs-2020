@@ -1,6 +1,12 @@
 # BuildingEnvironment
 
-[toc]
+- [BuildingEnvironment](#buildingenvironment)
+  - [WSL2+VSCode](#wsl2vscode)
+  - [如果你使用的是Ubuntu 22.04版本，请看这个](#如果你使用的是ubuntu-2204版本请看这个)
+    - [开始配置环境](#开始配置环境)
+      - [安装QEMU 5](#安装qemu-5)
+      - [riscv64 gnu toolchain](#riscv64-gnu-toolchain)
+      - [Boot xv6](#boot-xv6)
 
 ***By ZJay***
 
