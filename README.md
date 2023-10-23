@@ -10,10 +10,12 @@
 
 **食用方法：可直接按顺序跟着下面的学习笔记一步一步做。**
 
-## 学习笔记：
+## 学习笔记
 
 **[<font color = green1>BuildingEnvironment/环境搭建](/Note/BuildingEnvironment.md)**
 
-**[<font color = green1>Lab 1](/Note/MIT%206.S081%20Fall%202020%20Lab%201.md)**
+**[Lab 1](/Note/MIT%206.S081%20Fall%202020%20Lab%201.md)**
 
-**[<font color = green1>Lab 2](/Note/MIT%206.S081%20Fall%202020%20Lab%202.md)**
+**[Lab 2](/Note/MIT%206.S081%20Fall%202020%20Lab%202.md)**
+
+**[Lab 3](/Note/MIT%206.S081%20Fall%202020%20Lab%203.md)**
