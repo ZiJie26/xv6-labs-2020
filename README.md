@@ -12,10 +12,10 @@
 
 ## 学习笔记
 
-**[<font color = green1>BuildingEnvironment/环境搭建](/Note/BuildingEnvironment.md)**
+**[<font color = green1>BuildingEnvironment/环境搭建](./Note/BuildingEnvironment.md)**
 
-**[Lab 1](/Note/MIT%206.S081%20Fall%202020%20Lab%201.md)**
+**[Lab 1](./Note/MIT%206.S081%20Fall%202020%20Lab%201.md)**
 
-**[Lab 2](/Note/MIT%206.S081%20Fall%202020%20Lab%202.md)**
+**[Lab 2](./Note/MIT%206.S081%20Fall%202020%20Lab%202.md)**
 
-**[Lab 3](/Note/MIT%206.S081%20Fall%202020%20Lab%203.md)**
+**[Lab 3](./Note/MIT%206.S081%20Fall%202020%20Lab%203.md)**
