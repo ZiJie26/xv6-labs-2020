@@ -11,7 +11,6 @@
     - [primes](#primes)
     - [find](#find)
     - [xargs](#xargs)
-  - [time](#time)
   - [完成实验](#完成实验)
     - [提交到GitHub](#提交到github)
     - [提交到MIT](#提交到mit)
@@ -54,7 +53,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-由于 atoi 没有对非数字返回错误，这里我们这里处理一下 (虽然并不需要)，然后编辑 Makefile, 在 `UPROGS` 里加一行 `$U/_sleep\`。
+由于 atoi 没有对非数字返回错误，这里我们这里处理一下，然后编辑 Makefile, 在 `UPROGS` 里加一行 `$U/_sleep\`。
 
 ![picture 13](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%201/IMG_20230925-090259.png)  
 
@@ -142,7 +141,7 @@ int main() {
 
 ![picture 23](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%201/IMG_20230925-101842.png)  
 
-以下操作都类似，就只放代码了。
+以下操作都类似，创建相应文件然后加入makefile，就只放代码了。
 
 ### primes
 
@@ -158,15 +157,9 @@ int main() {
 
 >我们熟知的并发模型是共享内存, 通过共享的信号量和锁来进行临界资源的原子操作. 而 通信顺序过程Communicating Sequential Processes 模型是通过一个 没有缓存区的命名管道 进行的. 由于其没有缓存区, 且发送永远先于接收, 接收必须等发送完成才能进行. 于是整个多并发体系可以同步.
 
->有趣的是, 模型里的发送方和接收方并不知道对方, 所以消息传递可以不是线性的. (虽然这里用不到, 只是觉得很好玩)
-
->头大… 想了好久, 想到递归就找到路了.
-
 >第一个进程创建一个管道, 父进程输入数字, 子进程接收并进行筛法. 子进程采用递归的做法. 递归的参数是 left neighbor.
 
 >从其中读取第一个数, 筛法保证一定是素数. 建立一个新的管道 right neighbor 用来和它的子进程通信并同步. 父进程 (当前进程) 从 left neighbor 继续取, 如果不能被筛掉, 则写入 right neighbor 管道. 子进程 (当前进程的子进程) 调用筛法, 参数是 right neighbor 管道, 递归函数内进行下一个筛法处理.
-
->说不明白… 写完就有 流水线 的感觉了. 从前面接收一个, 处理这一个, 将结果交由后面处理.
 
 >写代码的时候需要注意, 由于文件描述符有限, 所以不用的管道要 close 掉. 比如父进程只会向管道里写东西, 而不会从管道里读东西, 所以可以把读取端给 close 掉. 这个操作不会影响子进程, 因为每个进程虽然共享文件描述符, 但是都维护自己的文件打开列表, 并不共享.
 
@@ -174,7 +167,7 @@ int main() {
 
 >fork 只会在当前处产生分支, 父子进程走不同的路.
 
-代码：
+代码：`user/primes.c`
 
 ```c
 #include "kernel/types.h"
@@ -253,7 +246,9 @@ int main() {
 
 同样引用自Wings大佬：
 
->~~大模拟~~!很容易想到递归. 参考 `ls.c`, 递归的参数是 file path, 这样就需要在 main 调用递归函数之前判断第一个参数是不是目录. fstat 查看文件状态, 可以看到是目录还是文件. 目录可以 open, 里面存的是 struct dirent[], 表示这个目录下面的每个文件. 这里面才有文件名. 处理一下这些文件的 path, 递归调用即可. 注意 . 和 .. 不要进去就行.
+>很容易想到递归. 参考 `ls.c`, 递归的参数是 file path, 这样就需要在 main 调用递归函数之前判断第一个参数是不是目录. fstat 查看文件状态, 可以看到是目录还是文件. 目录可以 open, 里面存的是 struct dirent[], 表示这个目录下面的每个文件. 这里面才有文件名. 处理一下这些文件的 path, 递归调用即可. 注意 . 和 .. 不要进去就行.
+
+`user/find.c`
 
 ```c
 #include "kernel/types.h"
@@ -350,7 +345,7 @@ int main(int argc, char const *argv[]) {
 
 >这题主要是运用 fork exec 那套逻辑
 
-代码：
+代码：`user/xargs.c`
 
 ```c
 #include "kernel/types.h"
@@ -423,44 +418,6 @@ int main(int argc, char const *argv[]) {
 测试结果：
 
 ![picture 33](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%201/IMG_20230925-110719.png)  
-
-## time
-
->不是官方上面的 uptime.
-
->本来写了个 time, 想着验证一下 CSP 并发筛法的时间. 结果由于文件描述符太少了, 数据跑不到大, 普通筛法和并发筛法小数据都是 1 tricks 跑完. 放一下 time 吧. 非常简单的 fork exec. 父进程调用 uptime 系统调用获取当前 tricks, 然后 wait 子进程 exec 完, 再调用一次 uptime 算时间差即可.
-
->UPD: 发现 main 的 argv 参数类型不用 const 限制会方便很多…
-
-```c
-#include "kernel/types.h"
-#include "kernel/stat.h"
-#include "kernel/param.h"
-#include "user/user.h"
-
-int main(int argc, char const *argv[]) {
-    if (argc == 1) {
-        fprintf(2, "Usage: time COMMAND ...\n");
-        exit(1);
-    }
-    int pid = fork();
-    if (pid > 0) {
-        int start = uptime();
-        int status;
-        wait(&status);
-        int end = uptime();
-        printf("==============\ntime ticks: %d\n", end - start);
-    }
-    else if (pid == 0) {
-        char cmd[128];
-        strcpy(cmd, argv[1]);
-        char *nargv[MAXARG + 1];
-        memcpy(nargv, argv + 1, sizeof(char *) * (argc - 1));
-        exec(cmd, nargv);
-    }
-    exit(0);
-}
-```
 
 ## 完成实验
 

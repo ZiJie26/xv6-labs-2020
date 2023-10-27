@@ -10,7 +10,7 @@
 
 **食用方法：可直接按顺序跟着下面的学习笔记一步一步做。**
 
-## 学习笔记
+## 学习笔记（施工中！）
 
 **[<font color = green1>BuildingEnvironment/环境搭建](./Note/BuildingEnvironment.md)**
 
