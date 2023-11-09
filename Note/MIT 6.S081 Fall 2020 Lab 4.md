@@ -219,7 +219,7 @@ $
 
 ![picture 6](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231107_083642.png)  
 
-## test0: invoke handler(调用处理程序)
+**test0: invoke handler(调用处理程序)**
 
 ![picture 7](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231107_083850.png)  
 
@@ -242,6 +242,270 @@ make CPUS=1 qemu-gdb
 
 ![picture 10](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231107_084405.png)  
 
-## test1/test2(): resume interrupted code(恢复被中断的代码)
+**test1/test2(): resume interrupted code(恢复被中断的代码)**
 
 ![picture 11](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231107_084654.png)  
+
+---
+
+**添加系统调用 sigalarm 和 sigreturn：**
+
+### `Makefile`
+
+```C
+ $U/_grind\
+ $U/_wc\
+ $U/_zombie\
+ $U/_alarmtest\
+```
+
+### `kernel/defs.h`
+
+```c
+void            trapinithart(void);
+extern struct spinlock tickslock;
+void            usertrapret(void);
+int             sigalarm(int n, void(*fn)(void));//ADD
+int             sigreturn();//ADD
+// uart.c
+void            uartinit(void);
+```
+
+### `kernel/syscall.h`
+
+```c
+#define SYS_link   19
+#define SYS_mkdir  20
+#define SYS_close  21
+#define SYS_sigalarm  22 //ADD
+#define SYS_sigreturn  23 //ADD
+```
+
+### `kernel/syscall.c`
+
+```C
+extern uint64 sys_wait(void);
+extern uint64 sys_write(void);
+extern uint64 sys_uptime(void);
+extern uint64 sys_sigalarm(void); //ADD
+extern uint64 sys_sigreturn(void); //ADD
+
+static uint64 (*syscalls[])(void) = {
+[SYS_fork]    sys_fork,
+```
+
+```C
+[SYS_link]    sys_link,
+[SYS_mkdir]   sys_mkdir,
+[SYS_close]   sys_close,
+[SYS_sigalarm]   sys_sigalarm, //ADD
+[SYS_sigreturn]   sys_sigreturn, //ADD
+};
+
+void
+```
+
+### `user/user.h`
+
+```c
+char* sbrk(int);
+int sleep(int);
+int uptime(void);
+int sigalarm(int ticks, void (*handler)()); //add
+int sigreturn(void); //add
+
+// ulib.c
+int stat(const char*, struct stat*);
+```
+
+### `user/usys.pl`
+
+```c
+entry("sbrk");
+entry("sleep");
+entry("uptime");
+entry("sigalarm");
+entry("sigreturn");
+```
+
+---
+
+### `kernel/proc.h`
+
+首先，在 proc 结构体的定义中，增加 alarm 相关字段：
+
+- alarm_interval：时钟周期，0 为禁用
+- alarm_handler：时钟回调处理函数
+- alarm_ticks：下一次时钟响起前还剩下的 ticks 数
+- alarm_trapframe：时钟中断时刻的 trapframe，-用于中断处理完成后恢复原程序的正常执行
+- alarm_goingoff：是否已经有一个时钟回调正在执行且还未返回（用于防止在 alarm_handler 中途闹钟到期再次调用 alarm_handler，导致 alarm_trapframe 被覆盖）
+
+```C
+  struct proc {
+  // ......
+  int alarm_interval;          // Alarm interval (0 for disabled)
+  void(*alarm_handler)();      // Alarm handler
+  int alarm_ticks;             // How many ticks left before next alarm goes off
+  struct trapframe *alarm_trapframe;  // A copy of trapframe right before running alarm_handler
+  int alarm_goingoff;          // Is an alarm currently going off and hasn't not yet returned? (prevent re-entrance of alarm_handler)
+};
+```
+
+### `kernel/sysproc.c`
+
+sigalarm 与 sigreturn 具体实现：
+
+```C
+// sysproc.c
+uint64 sys_sigalarm(void) {
+  int n;
+  uint64 fn;
+  if(argint(0, &n) < 0)
+    return -1;
+  if(argaddr(1, &fn) < 0)
+    return -1;
+  
+  return sigalarm(n, (void(*)())(fn));
+}
+
+
+uint64 sys_sigreturn(void) {
+  return sigreturn();
+}
+```
+
+### `kernel/trap.c`
+
+sigalarm 与 sigreturn 具体实现：
+
+```c
+// trap.c
+int sigalarm(int ticks, void(*handler)()) {
+  // 设置 myproc 中的相关属性
+  struct proc *p = myproc();
+  p->alarm_interval = ticks;
+  p->alarm_handler = handler;
+  p->alarm_ticks = ticks;
+  return 0;
+}
+
+int sigreturn() {
+  // 将 trapframe 恢复到时钟中断之前的状态，恢复原本正在执行的程序流
+  struct proc *p = myproc();
+  *p->trapframe = *p->alarm_trapframe;
+  p->alarm_goingoff = 0;
+  return 0;
+}
+```
+
+在 usertrap() 函数中，实现时钟机制具体代码：
+
+```C
+void
+usertrap(void)
+{
+  int which_dev = 0;
+
+  // ......
+
+  if(p->killed)
+    exit(-1);
+
+  // give up the CPU if this is a timer interrupt.
+  // if(which_dev == 2) {
+  //   yield();
+  // }
+
+  // give up the CPU if this is a timer interrupt.
+  if(which_dev == 2) {
+    if(p->alarm_interval != 0) { // 如果设定了时钟事件
+      if(--p->alarm_ticks <= 0) { // 时钟倒计时 -1 tick，如果已经到达或超过设定的 tick 数
+        if(!p->alarm_goingoff) { // 确保没有时钟正在运行
+          p->alarm_ticks = p->alarm_interval;
+          // jump to execute alarm_handler
+          *p->alarm_trapframe = *p->trapframe; // backup trapframe
+          p->trapframe->epc = (uint64)p->alarm_handler;
+          p->alarm_goingoff = 1;
+        }
+        // 如果一个时钟到期的时候已经有一个时钟处理函数正在运行，则会推迟到原处理函数运行完成后的下一个 tick 才触发这次时钟
+      }
+    }
+    yield();
+  }
+
+  usertrapret();
+}
+```
+
+这样，在每次时钟中断的时候，如果进程有已经设置的时钟（alarm_interval != 0），则进行 alarm_ticks 倒数。当 alarm_ticks 倒数到小于等于 0 的时候，如果没有正在处理的时钟，则尝试触发时钟，将原本的程序流保存起来（*alarm_trapframe =*trapframe），然后通过修改 pc 寄存器的值，将程序流转跳到 alarm_handler 中，alarm_handler 执行完毕后再恢复原本的执行流（*trapframe =*alarm_trapframe）。这样从原本程序执行流的视角，就是不可感知的中断了。
+
+### `kernel/proc.c`
+
+在 proc.c 中添加初始化与释放代码：
+
+```C
+// proc.c
+static struct proc*
+allocproc(void)
+{
+  // ......
+
+found:
+  p->pid = allocpid();
+
+  // Allocate a trapframe page.
+  if((p->trapframe = (struct trapframe *)kalloc()) == 0){
+    release(&p->lock);
+    return 0;
+  }
+
+  // Allocate a trapframe page for alarm_trapframe.
+  if((p->alarm_trapframe = (struct trapframe *)kalloc()) == 0){
+    release(&p->lock);
+    return 0;
+  }
+
+  p->alarm_interval = 0;
+  p->alarm_handler = 0;
+  p->alarm_ticks = 0;
+  p->alarm_goingoff = 0;
+
+  // ......
+
+  return p;
+}
+
+static void
+freeproc(struct proc *p)
+{
+  // ......
+  if(p->pagetable)
+    proc_freepagetable(p->pagetable, p->sz);
+  p->pagetable = 0;
+
+  if(p->alarm_trapframe)
+    kfree((void*)p->alarm_trapframe);
+  p->alarm_trapframe = 0;
+  
+  // ......
+  
+  p->chan = 0;
+  p->killed = 0;
+  p->xstate = 0;
+
+  p->alarm_interval = 0;
+  p->alarm_handler = 0;
+  p->alarm_ticks = 0;
+  p->alarm_goingoff = 0;
+
+  p->state = UNUSED;
+}
+```
+
+### 编译运行
+
+![picture 13](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231109_151719.png)  
+
+## make grade
+
+![picture 14](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231109_153106.png)  
