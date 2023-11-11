@@ -4,7 +4,15 @@
 
 ***by ZJay/楚梓杰***
 
-[toc]
+- [MIT 6.S081 Fall 2020 Lab 5](#mit-6s081-fall-2020-lab-5)
+  - [Eliminate allocation from sbrk() (easy)](#eliminate-allocation-from-sbrk-easy)
+  - [Lazy allocation (moderate)](#lazy-allocation-moderate)
+  - [Lazytests and Usertests (moderate)](#lazytests-and-usertests-moderate)
+    - [`kernel/defs.h`](#kerneldefsh)
+    - [`kernel/sysproc.c`](#kernelsysprocc)
+    - [`kernel/trap.c`](#kerneltrapc)
+    - [`kernel/vm.c`](#kernelvmc)
+  - [make grade](#make-grade)
 
 ![picture 0](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%205/IMG_20231110_084040.png)  
 

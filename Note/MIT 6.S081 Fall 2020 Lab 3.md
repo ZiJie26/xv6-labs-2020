@@ -4,7 +4,26 @@
 
 ***by ZJay/楚梓杰***
 
-[toc]
+- [MIT 6.S081 Fall 2020 Lab 3](#mit-6s081-fall-2020-lab-3)
+  - [Print a page table](#print-a-page-table)
+    - [`kernel/defs.h`](#kerneldefsh)
+    - [`kernel/exec.c`](#kernelexecc)
+    - [`kernel/vm.c`](#kernelvmc)
+  - [A kernel page table per process](#a-kernel-page-table-per-process)
+    - [`kernel/proc.h`](#kernelproch)
+    - [`kernel/vm.c`](#kernelvmc-1)
+    - [`kernel/proc.c`](#kernelprocc)
+    - [`kernel/defs.h`](#kerneldefsh-1)
+    - [`kernel/kalloc.c`](#kernelkallocc)
+    - [`kernel/virtio_disk.c`](#kernelvirtio_diskc)
+  - [Simplify `copyin/copyinstr`](#simplify-copyincopyinstr)
+    - [`kernel/defs.h`](#kerneldefsh-2)
+    - [`kernel/exec.c`](#kernelexecc-1)
+    - [`kernel/proc.c`](#kernelprocc-1)
+    - [`kernel/vm.c`](#kernelvmc-2)
+    - [`kernel/vmcopyin.c`](#kernelvmcopyinc)
+  - [make grade](#make-grade)
+
 要启动实验，请切换到pgtbl分支：
 
 ```linux

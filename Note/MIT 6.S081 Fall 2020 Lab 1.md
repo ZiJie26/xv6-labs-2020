@@ -437,7 +437,7 @@ int main(int argc, char const *argv[]) {
 
 **提交网站在**[这里](https://6828.scripts.mit.edu/2020/handin.py/)
 
-先填邮箱申请API然后可以用API登录（登录怎么都不能粘贴，最后手打了一遍API）
+先填邮箱申请API然后可以用API登录
 
 最后提交完是这样的：
 

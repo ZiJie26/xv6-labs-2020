@@ -4,7 +4,18 @@
 
 ***by ZJay/楚梓杰***
 
-[toc]
+- [MIT 6.S081 Fall 2020 Lab 6](#mit-6s081-fall-2020-lab-6)
+  - [Implement copy-on write (hard)](#implement-copy-on-write-hard)
+  - [fork 时不立刻复制内存](#fork-时不立刻复制内存)
+    - [`kernel/defs.h`](#kerneldefsh)
+    - [`kernel/vm.c`](#kernelvmc)
+    - [`kernel/riscv.h`](#kernelriscvh)
+  - [捕获写操作并执行复制](#捕获写操作并执行复制)
+    - [`kernel/trap.c`](#kerneltrapc)
+    - [`kernel/vm.c`](#kernelvmc-1)
+  - [物理页生命周期以及引用计数](#物理页生命周期以及引用计数)
+    - [`kernel/kalloc.c`](#kernelkallocc)
+  - [make grade](#make-grade)
 
 ![picture 0](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%206/IMG_20231110_101305.png)  
 

@@ -4,7 +4,27 @@
 
 ***by ZJay/楚梓杰***
 
-[toc]
+- [MIT 6.S081 Fall 2020 Lab 4](#mit-6s081-fall-2020-lab-4)
+  - [RISC-V assembly (easy)](#risc-v-assembly-easy)
+  - [Backtrace(moderate)](#backtracemoderate)
+    - [`kernel/defs.h`](#kerneldefsh)
+    - [`kernel/riscv.h`](#kernelriscvh)
+    - [`kernel/printf.c`](#kernelprintfc)
+    - [`kernel/sysproc.c`](#kernelsysprocc)
+    - [编译运行](#编译运行)
+  - [Alarm(Hard)](#alarmhard)
+    - [`Makefile`](#makefile)
+    - [`kernel/defs.h`](#kerneldefsh-1)
+    - [`kernel/syscall.h`](#kernelsyscallh)
+    - [`kernel/syscall.c`](#kernelsyscallc)
+    - [`user/user.h`](#useruserh)
+    - [`user/usys.pl`](#userusyspl)
+    - [`kernel/proc.h`](#kernelproch)
+    - [`kernel/sysproc.c`](#kernelsysprocc-1)
+    - [`kernel/trap.c`](#kerneltrapc)
+    - [`kernel/proc.c`](#kernelprocc)
+    - [编译运行](#编译运行-1)
+  - [make grade](#make-grade)
 
 ![picture 0](.assets_IMG/MIT%206.S081%20Fall%202020%20Lab%204/IMG_20231106_142229.png)  
 
