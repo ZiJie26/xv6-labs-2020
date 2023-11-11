@@ -22,4 +22,6 @@
 
 **[Lab 4](./Note/MIT%206.S081%20Fall%202020%20Lab%204.md)**
 
-**[Lab5](./Note/MIT%206.S081%20Fall%202020%20Lab%205.md)**
+**[Lab 5](./Note/MIT%206.S081%20Fall%202020%20Lab%205.md)**
+
+**[Lab 6](./Note/MIT%206.S081%20Fall%202020%20Lab%206.md)**
